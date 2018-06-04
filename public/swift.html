@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Swift</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+          integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        form {
+            position: fixed;
+            padding: 20px 50px 0 0;
+            bottom: 0;
+            width: 100%;
+        }
+        #messages {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        #messages li {
+            padding: 5px 10px;
+        }
+
+        #messages li:nth-child(odd) {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <ul id="messages">
+
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <form>
+                <div class="input-group">
+                    <input id="m" autocomplete="off" type="text" class="form-control" placeholder="Message...">
+                    <span class="input-group-btn">
+                    <button class="btn btn-secondary" type="button">Send!</button>
+                </span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+        integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"
+        integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+        integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+        crossorigin="anonymous"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const room = 'swift';
+  const socket = io('/tech');
+
+  $('form').submit((event) => {
+    const $node = $('#m');
+    let message = $node.val();
+    event.preventDefault();
+    socket.emit('message', { room, message });
+    $node.val('');
+  });
+
+  socket.on('connect', () => {
+    // emiting to everybody
+    socket.emit('join', { room });
+  });
+
+  socket.on('message', (message) => {
+    console.log(message);
+    $('#messages').append($('<li>').text(message));
+  });
+</script>
+</body>
+</html>
